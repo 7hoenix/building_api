@@ -1,26 +1,16 @@
 class ItemsController < ApplicationController
+  respond_to :html, :json, :xml
+
   def index
     @items = Item.all
 
-    begin
-    respond_to do |format|
-      format.html { @items }
-      format.json { render json: @items }
-      #format.xml { render xml: @items }
-    end
-    rescue ActionController::UnknownFormat
-      redirect_to root_path
-    end
+    respond_with @items
   end
 
   def show
     @item = Item.find_by(id: params[:id])
 
-    respond_to do |format|
-      format.html { @item }
-      format.json { render json: @item }
-      format.xml { render xml: @item }
-    end
+    respond_with @item
   end
 
   def new
@@ -31,10 +21,16 @@ class ItemsController < ApplicationController
     @item = Item.new(item_params)
 
     if @item.save
-      redirect_to items_path, notice: "The item was created."
+      response_to do |format|
+        format.html { redirect_to items_path, notice: "The item was created." }
+      end
     else
-      flash.now[:notice] = "The item was not created."
-      render :edit
+      respond_to do |format|
+        format.html do |format|
+          flash.now[:notice] = "The item was not created."
+          render :edit
+        end
+      end
     end
   end
 
