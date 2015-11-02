@@ -1,10 +1,26 @@
 class ItemsController < ApplicationController
   def index
     @items = Item.all
+
+    begin
+    respond_to do |format|
+      format.html { @items }
+      format.json { render json: @items }
+      #format.xml { render xml: @items }
+    end
+    rescue ActionController::UnknownFormat
+      redirect_to root_path
+    end
   end
 
   def show
     @item = Item.find_by(id: params[:id])
+
+    respond_to do |format|
+      format.html { @item }
+      format.json { render json: @item }
+      format.xml { render xml: @item }
+    end
   end
 
   def new
